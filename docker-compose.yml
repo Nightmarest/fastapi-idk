@@ -4,12 +4,12 @@ services:
     expose:
       - "8000"
     volumes:
-      - db-data:/data
+      - .:/app
+      - ./app.db:/app/app.db
     environment:
       - PYTHONUNBUFFERED=1
     networks:
       - app-network
-
   nginx:
     image: nginx:alpine
     ports:
