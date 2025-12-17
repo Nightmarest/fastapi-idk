@@ -35,10 +35,13 @@ A simple FastAPI backend with user registration, authentication (JWT), and revie
 ├── nginx/
 │   ├── nginx.conf        # Nginx configuration with SSL
 │   └── nginx-init.conf   # Initial Nginx configuration (HTTP only)
+├── scripts/
+│   └── certbot-renew.sh  # Certbot auto-renewal script
 ├── requirements.txt
 ├── Dockerfile
 ├── docker-compose.yml
 ├── init-letsencrypt.sh   # SSL certificate initialization script
+├── DEPLOYMENT.md         # Detailed production deployment guide
 └── README.md
 ```
 
