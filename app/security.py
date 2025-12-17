@@ -5,7 +5,7 @@ from jwt.exceptions import InvalidTokenError
 
 # WARNING: This secret key is hardcoded for demo purposes only.
 # In production, use environment variables: SECRET_KEY = os.getenv("JWT_SECRET")
-SECRET_KEY = "your-secret-key-change-in-production"
+SECRET_KEY = "leN2x9mKNY7K7E6Z9ofrRoP3lyCyh4Om9Q3ppfmBHDt"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
