@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 from typing import Optional
 
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 from app import crud, models, schemas
 from app.database import engine, get_db, Base
