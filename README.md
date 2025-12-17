@@ -289,6 +289,60 @@ To remove the database volume as well:
 docker compose down -v
 ```
 
+## SSL Certificate Management
+
+### Certificate Renewal
+
+The certbot service automatically renews certificates every 12 hours. No manual intervention is required.
+
+### Manual Certificate Renewal
+
+If you need to manually renew the certificate:
+
+```bash
+docker compose run --rm certbot renew
+docker compose exec nginx nginx -s reload
+```
+
+### Testing with Staging Certificate
+
+For testing purposes, use the staging environment to avoid Let's Encrypt rate limits:
+
+```bash
+STAGING=1 ./init-letsencrypt.sh
+```
+
+### Switching from Staging to Production
+
+1. Remove the staging certificates:
+```bash
+sudo rm -rf ./certbot/conf/*
+```
+
+2. Run the initialization script without staging:
+```bash
+./init-letsencrypt.sh
+```
+
+## Troubleshooting
+
+### nginx fails to start
+
+- Check if ports 80 and 443 are available
+- Verify nginx configuration syntax: `docker compose exec nginx nginx -t`
+
+### Certificate request fails
+
+- Ensure DNS is properly configured for api.albert-bet.ru
+- Verify port 80 is accessible from the internet
+- Check certbot logs: `docker compose logs certbot`
+
+### API not accessible
+
+- Check all services are running: `docker compose ps`
+- View nginx logs: `docker compose logs nginx`
+- View API logs: `docker compose logs web`
+
 ## License
 
 MIT
