@@ -22,9 +22,9 @@ if [[ "${decision:-N}" != "y" && "${decision:-N}" != "Y" ]]; then
   exit 1
 fi
 
-# Подготовка директорий для webroot
-mkdir -p ./data/certbot/www
-mkdir -p ./data/certbot/conf
+# Подготовка директорий для webroot и конфигурации (согласовано с docker-compose.yml)
+mkdir -p ./certbot/www
+mkdir -p ./certbot/conf
 
 echo
 echo "Starting services..."
@@ -42,9 +42,9 @@ done
 
 echo "Requesting Let's Encrypt certificate for ${DOMAIN}..."
 
-# ПЕРВИЧНАЯ ВЫДАЧА (НЕ renew!)
-${COMPOSE} run --rm ${CERTBOT_SERVICE} \
-  certonly \
+# ПЕРВИЧНАЯ ВЫДАЧА: переопределяем entrypoint, явно запускаем 'certbot certonly'
+${COMPOSE} run --rm --entrypoint "" ${CERTBOT_SERVICE} \
+  certbot certonly \
   --webroot -w /var/www/certbot \
   -d "${DOMAIN}" \
   --email "${EMAIL}" \
@@ -59,4 +59,4 @@ echo "Reloading nginx..."
 ${COMPOSE} exec -T ${NGINX_SERVICE} nginx -s reload
 
 echo
-echo "Done. Certificates should be in ./data/certbot/conf/live/${DOMAIN}/"
+echo "Done. Certificates should be in ./certbot/conf/live/${DOMAIN}/"
