@@ -73,20 +73,38 @@ if [ $? -eq 0 ]; then
     echo "Now updating nginx to use SSL configuration..."
     
     # Update docker-compose to use SSL nginx config
-    docker compose exec nginx cp /etc/nginx/nginx.conf.full /etc/nginx/nginx.conf || echo "Manual configuration switch needed"
+    if docker compose exec nginx cp /etc/nginx/nginx.conf.full /etc/nginx/nginx.conf; then
+        echo "✓ Nginx configuration updated"
+    else
+        echo ""
+        echo "⚠ Could not automatically switch nginx configuration."
+        echo "Please manually update docker-compose.yml to use nginx.conf instead of nginx-init.conf:"
+        echo ""
+        echo "  volumes:"
+        echo "    - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+        echo ""
+        echo "Then restart nginx:"
+        echo "  docker compose restart nginx"
+        echo ""
+    fi
     
     echo "Reloading nginx..."
-    docker compose exec nginx nginx -s reload
-    
-    echo ""
-    echo "================================================"
-    echo "✓ SSL Certificate Setup Complete!"
-    echo "================================================"
-    echo ""
-    echo "Your API is now accessible at: https://$DOMAIN"
-    echo ""
-    echo "Certificate auto-renewal is configured and will run every 12 hours."
-    echo ""
+    if docker compose exec nginx nginx -s reload; then
+        echo ""
+        echo "================================================"
+        echo "✓ SSL Certificate Setup Complete!"
+        echo "================================================"
+        echo ""
+        echo "Your API is now accessible at: https://$DOMAIN"
+        echo ""
+        echo "Certificate auto-renewal is configured and will run every 12 hours."
+        echo ""
+    else
+        echo ""
+        echo "⚠ Failed to reload nginx. Please restart the nginx service:"
+        echo "  docker compose restart nginx"
+        echo ""
+    fi
 else
     echo ""
     echo "✗ Failed to obtain certificate."
