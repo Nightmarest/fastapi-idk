@@ -8,7 +8,7 @@ A simple FastAPI backend with user registration, authentication (JWT), and revie
 - JWT Bearer authentication for login
 - User profile endpoints (GET and PATCH)
 - Casino management system (create and list casinos)
-- Review system with stars (1-5) and comments for casinos
+- Review system with stars (1-5), comments, and author names for casinos
 - Each user can only submit one review per casino
 - SQLite database with persistent volume
 - Docker containerization
@@ -265,7 +265,8 @@ Response:
   "stars": 5,
   "comment": "Great service!",
   "user_id": 1,
-  "casino_id": 1
+  "casino_id": 1,
+  "author_name": "John Doe"
 }
 ```
 
@@ -285,7 +286,8 @@ Response:
     "stars": 5,
     "comment": "Great service!",
     "user_id": 1,
-    "casino_id": 1
+    "casino_id": 1,
+    "author_name": "John Doe"
   }
 ]
 ```
@@ -304,14 +306,16 @@ Response:
     "stars": 5,
     "comment": "Great service!",
     "user_id": 1,
-    "casino_id": 1
+    "casino_id": 1,
+    "author_name": "John Doe"
   },
   {
     "id": 2,
     "stars": 4,
     "comment": "Good experience",
     "user_id": 2,
-    "casino_id": 1
+    "casino_id": 1,
+    "author_name": "Jane Smith"
   }
 ]
 ```
