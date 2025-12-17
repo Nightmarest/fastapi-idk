@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 from typing import Optional
+
+from starlette.middleware.cors import CORSMiddleware
+
 from app import crud, models, schemas
 from app.database import engine, get_db, Base
 from app.security import verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -11,6 +14,9 @@ from app.deps import get_current_user
 # Create tables
 Base.metadata.create_all(bind=engine)
 
+
+app = FastAPI(title="FastAPI Backend", version="1.0.0")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Разрешить все домены
@@ -18,9 +24,6 @@ app.add_middleware(
     allow_methods=["*"],  # Разрешить все методы
     allow_headers=["*"],  # Разрешить все заголовки
 )
-
-app = FastAPI(title="FastAPI Backend", version="1.0.0")
-
 
 @app.get("/")
 def read_root():
