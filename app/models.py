@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 from app.database import Base
 
 
@@ -34,6 +35,10 @@ class Review(Base):
 
     user = relationship("User", back_populates="reviews")
     casino = relationship("Casino", back_populates="reviews")
+
+    @property
+    def author_name(self):
+        return self.user.name if self.user else None
 
     __table_args__ = (
         CheckConstraint('stars >= 1 AND stars <= 5', name='check_stars_range'),
