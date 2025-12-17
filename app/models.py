@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -14,6 +14,15 @@ class User(Base):
     reviews = relationship("Review", back_populates="user")
 
 
+class Casino(Base):
+    __tablename__ = "casinos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)
+
+    reviews = relationship("Review", back_populates="casino")
+
+
 class Review(Base):
     __tablename__ = "reviews"
 
@@ -21,9 +30,12 @@ class Review(Base):
     stars = Column(Integer, nullable=False)
     comment = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    casino_id = Column(Integer, ForeignKey("casinos.id"), nullable=False)
 
     user = relationship("User", back_populates="reviews")
+    casino = relationship("Casino", back_populates="reviews")
 
     __table_args__ = (
         CheckConstraint('stars >= 1 AND stars <= 5', name='check_stars_range'),
+        UniqueConstraint('user_id', 'casino_id', name='unique_user_casino_review'),
     )

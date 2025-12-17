@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
+from typing import Optional
 from app import crud, models, schemas
 from app.database import engine, get_db, Base
 from app.security import verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -74,16 +76,50 @@ def update_users_me(
     return crud.update_user_name(db=db, user=current_user, name=user_update.name)
 
 
+@app.post("/casinos", response_model=schemas.CasinoResponse, status_code=status.HTTP_201_CREATED)
+def create_casino(
+    casino: schemas.CasinoCreate,
+    db: Session = Depends(get_db)
+):
+    try:
+        return crud.create_casino(db=db, casino=casino)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Casino with this name already exists"
+        )
+
+
+@app.get("/casinos", response_model=list[schemas.CasinoResponse])
+def read_casinos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    casinos = crud.get_casinos(db, skip=skip, limit=limit)
+    return casinos
+
+
 @app.post("/reviews", response_model=schemas.ReviewResponse, status_code=status.HTTP_201_CREATED)
 def create_review(
     review: schemas.ReviewCreate,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    return crud.create_review(db=db, review=review, user_id=current_user.id)
+    # Check if casino exists
+    casino = crud.get_casino(db, casino_id=review.casino_id)
+    if not casino:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Casino not found"
+        )
+    
+    try:
+        return crud.create_review(db=db, review=review, user_id=current_user.id)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have already submitted a review for this casino"
+        )
 
 
 @app.get("/reviews", response_model=list[schemas.ReviewResponse])
-def read_reviews(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    reviews = crud.get_reviews(db, skip=skip, limit=limit)
+def read_reviews(casino_id: Optional[int] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    reviews = crud.get_reviews(db, casino_id=casino_id, skip=skip, limit=limit)
     return reviews
