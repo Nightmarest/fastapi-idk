@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from typing import Optional
 from app import models, schemas
 from app.security import get_password_hash
 
@@ -45,19 +45,6 @@ def get_casinos(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_review(db: Session, review: schemas.ReviewCreate, user_id: int):
-    # Check if user already has a review for this casino
-    existing_review = db.query(models.Review).filter(
-        models.Review.user_id == user_id,
-        models.Review.casino_id == review.casino_id
-    ).first()
-    
-    if existing_review:
-        raise IntegrityError(
-            statement="User already has a review for this casino",
-            params=None,
-            orig=None
-        )
-    
     db_review = models.Review(
         stars=review.stars,
         comment=review.comment,
@@ -70,7 +57,7 @@ def create_review(db: Session, review: schemas.ReviewCreate, user_id: int):
     return db_review
 
 
-def get_reviews(db: Session, casino_id: int = None, skip: int = 0, limit: int = 100):
+def get_reviews(db: Session, casino_id: Optional[int] = None, skip: int = 0, limit: int = 100):
     query = db.query(models.Review)
     if casino_id is not None:
         query = query.filter(models.Review.casino_id == casino_id)

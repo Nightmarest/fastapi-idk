@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
+from typing import Optional
 from app import crud, models, schemas
 from app.database import engine, get_db, Base
 from app.security import verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -119,6 +120,6 @@ def create_review(
 
 
 @app.get("/reviews", response_model=list[schemas.ReviewResponse])
-def read_reviews(casino_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_reviews(casino_id: Optional[int] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     reviews = crud.get_reviews(db, casino_id=casino_id, skip=skip, limit=limit)
     return reviews
