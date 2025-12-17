@@ -4,10 +4,12 @@ A simple FastAPI backend with user registration, authentication (JWT), and revie
 
 ## Features
 
-- User registration with email, password, and name
+- User registration with email, password, and name (returns JWT token immediately)
 - JWT Bearer authentication for login
 - User profile endpoints (GET and PATCH)
-- Review system with stars (1-5) and comments
+- Casino management system (create and list casinos)
+- Review system with stars (1-5) and comments for casinos
+- Each user can only submit one review per casino
 - SQLite database with persistent volume
 - Docker containerization
 - Nginx reverse proxy with SSL/TLS support
@@ -116,9 +118,13 @@ STAGING=1 ./init-letsencrypt.sh
 - `GET /users/me` - Get current user profile (requires authentication)
 - `PATCH /users/me` - Update user name (requires authentication)
 
+### Casinos
+- `POST /casinos` - Create a new casino
+- `GET /casinos` - Get all casinos (supports pagination)
+
 ### Reviews
-- `POST /reviews` - Create a review (requires authentication)
-- `GET /reviews` - Get all reviews
+- `POST /reviews` - Create a review for a casino (requires authentication)
+- `GET /reviews` - Get all reviews (supports filtering by casino_id and pagination)
 
 ## Usage Examples
 
@@ -139,11 +145,15 @@ curl -X POST "https://api.albert-bet.ru/register" \
 Response:
 ```json
 {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
   "id": 1,
   "email": "user@example.com",
   "name": "John Doe"
 }
 ```
+
+**Note:** Registration now returns a JWT token immediately, so you can use the account right away without a separate login.
 
 ### 2. Login
 
@@ -197,7 +207,45 @@ Response:
 }
 ```
 
-### 5. Create a review
+### 5. Create a casino
+
+```bash
+curl -X POST "https://api.albert-bet.ru/casinos" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Lucky Casino"
+  }'
+```
+
+Response:
+```json
+{
+  "id": 1,
+  "name": "Lucky Casino"
+}
+```
+
+### 6. Get all casinos
+
+```bash
+curl -X GET "https://api.albert-bet.ru/casinos"
+```
+
+Response:
+```json
+[
+  {
+    "id": 1,
+    "name": "Lucky Casino"
+  },
+  {
+    "id": 2,
+    "name": "Royal Casino"
+  }
+]
+```
+
+### 7. Create a review for a casino
 
 ```bash
 curl -X POST "https://api.albert-bet.ru/reviews" \
@@ -205,7 +253,8 @@ curl -X POST "https://api.albert-bet.ru/reviews" \
   -H "Content-Type: application/json" \
   -d '{
     "stars": 5,
-    "comment": "Great service!"
+    "comment": "Great service!",
+    "casino_id": 1
   }'
 ```
 
@@ -215,11 +264,14 @@ Response:
   "id": 1,
   "stars": 5,
   "comment": "Great service!",
-  "user_id": 1
+  "user_id": 1,
+  "casino_id": 1
 }
 ```
 
-### 6. Get all reviews
+**Note:** Each user can only submit one review per casino. Attempting to submit a second review for the same casino will result in an error.
+
+### 8. Get all reviews
 
 ```bash
 curl -X GET "https://api.albert-bet.ru/reviews"
@@ -232,7 +284,34 @@ Response:
     "id": 1,
     "stars": 5,
     "comment": "Great service!",
-    "user_id": 1
+    "user_id": 1,
+    "casino_id": 1
+  }
+]
+```
+
+### 9. Get reviews for a specific casino
+
+```bash
+curl -X GET "https://api.albert-bet.ru/reviews?casino_id=1"
+```
+
+Response:
+```json
+[
+  {
+    "id": 1,
+    "stars": 5,
+    "comment": "Great service!",
+    "user_id": 1,
+    "casino_id": 1
+  },
+  {
+    "id": 2,
+    "stars": 4,
+    "comment": "Good experience",
+    "user_id": 2,
+    "casino_id": 1
   }
 ]
 ```
