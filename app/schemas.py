@@ -51,5 +51,6 @@ class ReviewResponse(BaseModel):
     comment: str
     user_id: int
     casino_id: int
+    author_name: str
 
     model_config = {"from_attributes": True}

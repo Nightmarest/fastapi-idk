@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Optional
 from app import models, schemas
 from app.security import get_password_hash
@@ -54,11 +54,13 @@ def create_review(db: Session, review: schemas.ReviewCreate, user_id: int):
     db.add(db_review)
     db.commit()
     db.refresh(db_review)
+    # Eagerly load the user relationship
+    db.refresh(db_review, attribute_names=['user'])
     return db_review
 
 
 def get_reviews(db: Session, casino_id: Optional[int] = None, skip: int = 0, limit: int = 100):
-    query = db.query(models.Review)
+    query = db.query(models.Review).options(joinedload(models.Review.user))
     if casino_id is not None:
         query = query.filter(models.Review.casino_id == casino_id)
     return query.offset(skip).limit(limit).all()
