@@ -11,6 +11,14 @@ from app.deps import get_current_user
 # Create tables
 Base.metadata.create_all(bind=engine)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Разрешить все домены
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешить все методы
+    allow_headers=["*"],  # Разрешить все заголовки
+)
+
 app = FastAPI(title="FastAPI Backend", version="1.0.0")
 
 
