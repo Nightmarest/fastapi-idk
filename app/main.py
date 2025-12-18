@@ -19,7 +19,7 @@ app = FastAPI(title="FastAPI Backend", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Разрешить все домены
+    allow_origins=["https://v0-casino-website-layout-olive.vercel.app"],  # Разрешить все домены
     allow_credentials=True,
     allow_methods=["*"],  # Разрешить все методы
     allow_headers=["*"],  # Разрешить все заголовки
@@ -87,7 +87,7 @@ def update_users_me(
     return crud.update_user_name(db=db, user=current_user, name=user_update.name)
 
 
-@app.post("/casinos", response_model=schemas.CasinoResponse, status_code=status.HTTP_201_CREATED)
+@app.post("/casino/add", response_model=schemas.CasinoResponse, status_code=status.HTTP_201_CREATED)
 def create_casino(
     casino: schemas.CasinoCreate,
     db: Session = Depends(get_db)
