@@ -114,12 +114,12 @@ def create_review(
     db: Session = Depends(get_db)
 ):
     # Check if casino exists
-    casino = crud.get_casino(db, casino_id=review.casino_id)
-    if not casino:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Casino not found"
-        )
+    # casino = crud.get_casino(db, casino_id=review.casino_id)
+    # if not casino:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail="Casino not found"
+    #     )
     
     try:
         return crud.create_review(db=db, review=review, user_id=current_user.id)
