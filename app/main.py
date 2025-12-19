@@ -19,7 +19,7 @@ app = FastAPI(title="FastAPI Backend", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://v0-casino-website-layout-olive.vercel.app"],  # Разрешить все домены
+    allow_origins=["https://v0-casino-website-layout-olive.vercel.app", "https://preview-casino-website-layout-kzmqotqeydp033wdt2yh.vusercontent.net/"],  # Разрешить все домены
     allow_credentials=True,
     allow_methods=["*"],  # Разрешить все методы
     allow_headers=["*"],  # Разрешить все заголовки
